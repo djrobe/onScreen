@@ -5,18 +5,42 @@
 //
 // Released under MIT license.
 ;(function($) {
-  $.expr[":"].onScreen = function(elem) {
-    var $window = $(window)
-    var viewport_top = $window.scrollTop()
-    var viewport_height = $window.height()
-    var viewport_bottom = viewport_top + viewport_height
-    var $elem = $(elem)
-    var top = $elem.offset().top
-    var height = $elem.height()
-    var bottom = top + height
+	var w = $(window);
+	
+	var onscreen = function(elem) {
+		var viewport_top = w.scrollTop(),
+			viewport_height = w.height(),
+			viewport_bottom = viewport_top + viewport_height,
+			el = $(elem),
+			top = el.offset().top,
+			height = el.height(),
+			bottom = top + height;
 
-    return (top >= viewport_top && top < viewport_bottom) ||
-           (bottom > viewport_top && bottom <= viewport_bottom) ||
-           (height > viewport_height && top <= viewport_top && bottom >= viewport_bottom)
-  }
+		return (top >= viewport_top && top < viewport_bottom)
+		    || (bottom > viewport_top && bottom <= viewport_bottom)
+		    || (height > viewport_height && top <= viewport_top && bottom >= viewport_bottom);
+	};
+	
+	$.expr[":"].onscreen = onscreen;
+	
+	$.expr[":"].offscreen = function(elem) {
+		return !onscreen(elem);
+	};
+	
+	$.expr[":"].belowscreen = function(elem) {
+		var viewport_bottom = w.scrollTop() + w.height(),
+			el = $(elem),
+			top = el.offset().top;
+
+		return top > viewport_bottom;
+	};
+	
+	$.expr[":"].abovescreen = function(elem) {
+		var viewport_top = w.scrollTop(),
+			el = $(elem),
+			bottom = el.offset().top + el.height();
+
+		return bottom < viewport_top;
+	}
 })(jQuery);
+
